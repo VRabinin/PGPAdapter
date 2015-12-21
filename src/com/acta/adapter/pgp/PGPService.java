@@ -1,10 +1,13 @@
 package com.acta.adapter.pgp;
+<<<<<<< Upstream, based on origin/master
 //lksjflkasjf;
 <<<<<<< Upstream, based on origin/master
 //TEST
 //ddd
 =======
 >>>>>>> 8298ec1 2015_12_21 17_21 CHANGES
+=======
+>>>>>>> ded63d4 2015_12_21 17_36 change VBY
 
 import com.acta.adapter.sdk.AdapterException;
 import com.acta.adapter.sdk.Operation;
