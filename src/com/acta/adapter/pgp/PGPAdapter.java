@@ -4,7 +4,7 @@ import com.acta.adapter.sdk.Adapter;
 import com.acta.adapter.sdk.AdapterEnvironment;
 import com.acta.adapter.sdk.AdapterException;
 
-
+//
 
 public class PGPAdapter implements Adapter {
     private String[] _operationClassNames = {"com.acta.adapter.pgp.PGPService"};
