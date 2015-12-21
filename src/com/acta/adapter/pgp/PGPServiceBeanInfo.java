@@ -1,5 +1,5 @@
 package com.acta.adapter.pgp;
-
+//ddd
 import java.beans.*;
 import com.acta.adapter.sdk.*;
 
