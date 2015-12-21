@@ -1,20 +1,5 @@
 package com.acta.adapter.pgp;
-<<<<<<< Upstream, based on origin/master
-<<<<<<< Upstream, based on origin/master
 
-// VBY test 3 4
-<<<<<<< Upstream, based on origin/master
-// VBY bla bla
-=======
-// VBY test 
->>>>>>> ded63d4 2015_12_21 17_36 change VBY
-=======
-// VBY test 3 4
-// VBY bla bla
->>>>>>> 4112f77 bla bla
-=======
-// VBY bla bla fuck
->>>>>>> 5f3a1ec VBY 1
 import java.util.Vector;
 
 import com.acta.adapter.sdk.Adapter;
