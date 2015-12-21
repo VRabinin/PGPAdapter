@@ -1,6 +1,10 @@
 package com.acta.adapter.pgp;
+<<<<<<< Upstream, based on origin/master
 
 
+=======
+// VBY test 2
+>>>>>>> 57374aa test message
 import java.util.Vector;
 
 import com.acta.adapter.sdk.Adapter;
