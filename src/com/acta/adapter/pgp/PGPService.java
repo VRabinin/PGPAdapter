@@ -1,5 +1,5 @@
 package com.acta.adapter.pgp;
-//fff
+//
 import com.acta.adapter.sdk.AdapterException;
 import com.acta.adapter.sdk.Operation;
 import com.acta.adapter.sdk.OperationEnvironment;
