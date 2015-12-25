@@ -14,6 +14,7 @@ set JAVABIN=%JAVA_HOME%\bin
 set JREBIN=c:\PROGRA~1\Java\jre1.8.0_31\bin\
 set CLASSPATH=%CLASSES%;%LIBEXT%\xercesImpl.jar;%LIB%\acta_adapter_sdk.jar;%LIB%\acta_broker_client.jar;%LIB%\acta_tool.jar;%LIB%\activation.jar;%LIB%\mailapi.jar;
 
+cd d:\HANAWSLuna\bodspgp\src\
 
 REM Making JAR files...
 
@@ -38,6 +39,7 @@ echo An ERROR occurred while building Adapter configuration template
 goto EXIT
 
 :D2
+goto EXIT
 pause
 echo Generating the startup configuration template file for Adapter
 "%JREBIN%\java" -classpath "%CLASSPATH%;%LINK_DIR%\lib\pgpadapter.jar" com.acta.adapter.sdkutil.CreateStartupTemplate "%LINK_DIR%" PGPAdapter

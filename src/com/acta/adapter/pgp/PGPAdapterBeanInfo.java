@@ -22,18 +22,51 @@ public class PGPAdapterBeanInfo extends SimpleBeanInfo {
         try
         {
             //
-            PropertyDescriptor globalParam1 = new PropertyDescriptor ( "globalParam1",com.acta.adapter.pgp.PGPAdapter.class, null, "setGlobalParam1" ) ;
-            globalParam1.setDisplayName("globalParam1") ;
-            globalParam1.setShortDescription("Blaaaaaa") ;
-            globalParam1.setValue(GuiAttributes.ATTR_ORDER, "1" );
+            PropertyDescriptor generatePGP = new PropertyDescriptor ( "generatePGP",com.acta.adapter.pgp.PGPAdapter.class) ;
+            generatePGP.setDisplayName("Generate PGP") ;
+            generatePGP.setShortDescription("(Attention!!! This option triggers generation of the new PGP environment)") ;
+            generatePGP.setValue(GuiAttributes.ATTR_CHOICES, "true"+"|"+"false" );
+            generatePGP.setValue(GuiAttributes.ATTR_DEFAULT, "false" );    
+            generatePGP.setValue(GuiAttributes.ATTR_ORDER, "1" );
+    //        generatePGP.setBound(true);
+     //       generatePGP.setConstrained(true);
+     //       generatePGP.setExpert(true);
+      //      generatePGP.setHidden(true);
+      //      generatePGP.setPreferred(true);
             
-            PropertyDescriptor globalParam2 = new PropertyDescriptor ( "globalParam2",com.acta.adapter.pgp.PGPAdapter.class, null, "setGlobalParam2" ) ;
-            globalParam2.setDisplayName("globalParam2 - Secret") ;
-            globalParam2.setShortDescription("Blaaaaaaaaaaaaaaaaa.") ;
-            globalParam2.setValue(GuiAttributes.ATTR_ECHO, "false" );
-            globalParam2.setValue(GuiAttributes.ATTR_ORDER, "2" );
             
-            pd = new PropertyDescriptor [] { globalParam1, globalParam2 } ;
+            PropertyDescriptor userNamePGP = new PropertyDescriptor ( "userNamePGP",com.acta.adapter.pgp.PGPAdapter.class) ;
+            userNamePGP.setDisplayName("User Name") ;
+            userNamePGP.setShortDescription("User name for PGP keypair") ;
+            userNamePGP.setValue(GuiAttributes.ATTR_ORDER, "2" );
+            userNamePGP.setValue(GuiAttributes.ATTR_REQUIRED, "true" );
+            
+            PropertyDescriptor emailPGP = new PropertyDescriptor ( "emailPGP",com.acta.adapter.pgp.PGPAdapter.class) ;
+            emailPGP.setDisplayName("User E-Mail") ;
+            emailPGP.setShortDescription("User E-Mail for PGP keypair") ;
+            emailPGP.setValue(GuiAttributes.ATTR_ORDER, "3" );
+            emailPGP.setValue(GuiAttributes.ATTR_REQUIRED, "true" );
+            
+            PropertyDescriptor passphrasePGP = new PropertyDescriptor ( "passphrasePGP",com.acta.adapter.pgp.PGPAdapter.class) ;
+            passphrasePGP.setDisplayName("Passphrase") ;
+            passphrasePGP.setShortDescription("Passphrase for PGP secure keyring") ;
+            passphrasePGP.setValue(GuiAttributes.ATTR_ORDER, "4" );
+            passphrasePGP.setValue(GuiAttributes.ATTR_ECHO, "false" );
+            passphrasePGP.setValue(GuiAttributes.ATTR_REQUIRED, "true" );
+            
+            PropertyDescriptor directoryPGP = new PropertyDescriptor ( "directoryPGP",com.acta.adapter.pgp.PGPAdapter.class) ;
+            directoryPGP.setDisplayName("PGP Directory") ;
+            directoryPGP.setShortDescription("Directory for storing PGP keyrings") ;
+            directoryPGP.setValue(GuiAttributes.ATTR_ORDER, "5" );
+            directoryPGP.setValue(GuiAttributes.ATTR_REQUIRED, "true" );
+            
+            PropertyDescriptor publicKeyPGP = new PropertyDescriptor ( "publicKeyPGP",com.acta.adapter.pgp.PGPAdapter.class) ;
+            publicKeyPGP.setDisplayName("publicKeyPGP - Secret") ;
+            publicKeyPGP.setShortDescription("Generated Public Key - to be copied into a file and transferred to remote party") ;
+            publicKeyPGP.setValue(GuiAttributes.ATTR_ORDER, "6" );
+            publicKeyPGP.setValue(GuiAttributes.ATTR_EDITABLE, "false" );
+            
+            pd = new PropertyDescriptor [] { generatePGP, userNamePGP, emailPGP, passphrasePGP, directoryPGP, publicKeyPGP } ;
         }
         catch (Exception exc)
         {

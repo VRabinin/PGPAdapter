@@ -12,8 +12,13 @@ import com.acta.adapter.sdk.AdapterException;
 public class PGPAdapter implements Adapter {
 //    private String[] _operationClassNames = {"com.acta.adapter.pgp.PGPService"};
     private String[] _operationClassNames = {"com.acta.adapter.pgp.PGPReadTable"};
-	private String globalParam1;  
-	private String globalParam2; 	
+    private String generatePGP = null;
+	private String userNamePGP = null;  
+	private String emailPGP = null;
+	private String passphrasePGP = null;
+	private String directoryPGP = null;
+	private String publicKeyPGP = null;
+	
 	@Override
 
 	
@@ -26,6 +31,8 @@ public class PGPAdapter implements Adapter {
         ("com.acta.adapter.pgp.PGPImport");
         environment.setSessionClassName
         ("com.acta.adapter.pgp.PGPSession");
+      //  if( publicKeyPGP==null || publicKeyPGP=="")
+        	setGeneratePGP("true");
 	}
 
 	@Override
@@ -56,20 +63,50 @@ public class PGPAdapter implements Adapter {
 
 	}
 
-    public String getGlobalParam1() {
-        return globalParam1;
+    public String getGeneratePGP() {
+        return generatePGP;
     }
 
-    public void setGlobalParam1(String param) {
-        this.globalParam1 = param;
+    public void setGeneratePGP(String param) {
+        this.generatePGP = param;
+    }
+	
+    public String getUserNamePGP() {
+        return userNamePGP;
+    }
+
+    public void setUserNamePGP(String param) {
+        this.userNamePGP = param;
     }
     
-    public String getGlobalParam2() {
-        return globalParam2;
+    public String getEmailPGP() {
+        return emailPGP;
     }
 
-    public void setGlobalParam2(String param) {
-        this.globalParam2 = param;
+    public void setEmailPGP(String param) {
+        this.emailPGP = param;
     }	
 	
+    public String getPassphrasePGP() {
+        return passphrasePGP;
+    }
+
+    public void setPassphrasePGP(String param) {
+        this.passphrasePGP = param;
+    }
+    
+    public String getDirectoryPGP() {
+        return directoryPGP;
+    }
+
+    public void setDirectoryPGP(String param) {
+        this.directoryPGP = param;
+    }
+    public String getPublicKeyPGP() {
+        return publicKeyPGP;
+    }
+
+    public void setPublicKeyPGP(String param) {
+        this.publicKeyPGP = param;
+    }
 }
