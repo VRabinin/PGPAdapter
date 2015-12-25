@@ -8,9 +8,8 @@ import com.acta.adapter.sdk.StreamOperation;
 
 public class PGPService implements Operation, StreamOperation {
     private OperationEnvironment    _adapterOperationEnvironment ;
-    private PGPAdapter              _adapter ;
+//    private PGPAdapter              _adapter ;
 	public String param1;  
-	public String param2; 
 	@Override
 	public void begin() throws AdapterException {
 		// TODO Auto-generated method stub
@@ -32,7 +31,7 @@ public class PGPService implements Operation, StreamOperation {
 	@Override
 	public void initialize(OperationEnvironment adapterOperationEnvironment) {
         _adapterOperationEnvironment = adapterOperationEnvironment ;
-        _adapter = (PGPAdapter)_adapterOperationEnvironment.getAdapter() ;
+  //      _adapter = (PGPAdapter)_adapterOperationEnvironment.getAdapter() ;
 	}
 
 	@Override
@@ -54,13 +53,6 @@ public class PGPService implements Operation, StreamOperation {
     public void setParam1(String param) {
         this.param1 = param;
     }	
-    
-    public String getParam2() {
-        return param2;
-    }
-
-    public void setParam2(String param) {
-        this.param2 = param;
-    }	
+    	
 	
 }

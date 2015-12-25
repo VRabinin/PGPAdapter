@@ -6,8 +6,11 @@ import com.acta.adapter.sdk.AdapterException;
 import com.acta.adapter.sdk.Session;
 
 public class PGPSession implements Session {
+	  //------------------------------------------------------
+	  //adapter's configurable properties
+	  //
+	  private String importDirectory ;
 
-	@Override
 	public void initialize(Adapter adapter, AdapterEnvironment adapterEnvironment) {
 		// TODO Auto-generated method stub
 
@@ -25,4 +28,19 @@ public class PGPSession implements Session {
 
 	}
 
+	  /**
+	   * Sets imort Directory.
+	   */
+	  public void setImportDirectory ( String dir )
+	  {
+	    importDirectory = dir ;
+	  }
+	  /**
+	   * Returns the subdirectory under the adapter directory, {@link WAdapter#setRootDirectory rootDirectory}.
+	   */
+	  public String getImportDirectory ( )
+	  {
+	    return importDirectory ;
+	  }	
+	
 }
