@@ -1,5 +1,8 @@
 package com.acta.adapter.pgp;
 
+import java.io.File;
+
+import com.acta.adapter.pgp.crypto.PGPCrypto;
 import com.acta.adapter.sdk.Adapter;
 import com.acta.adapter.sdk.AdapterEnvironment;
 import com.acta.adapter.sdk.AdapterException;
@@ -12,18 +15,20 @@ import com.acta.adapter.sdk.AdapterException;
 public class PGPAdapter implements Adapter {
 //    private String[] _operationClassNames = {"com.acta.adapter.pgp.PGPService"};
     private String[] _operationClassNames = {"com.acta.adapter.pgp.PGPReadTable"};
+    private AdapterEnvironment _adapterEnvironment = null;
     private String generatePGP = null;
 	private String userNamePGP = null;  
 	private String emailPGP = null;
 	private String passphrasePGP = null;
 	private String directoryPGP = null;
 	private String publicKeyPGP = null;
-	
+	public PGPCrypto crypto = null;
+	  
 	@Override
 
 	
 	public void initialize(AdapterEnvironment environment) {
-		// TODO Auto-generated method stub
+		_adapterEnvironment = environment;
         environment.setOperationDescriptor(_operationClassNames) ;
 //        environment.setMetadataBrowsingClassName
 //        ("com.acta.adapter.pgp.PGPBrowse");
@@ -31,20 +36,64 @@ public class PGPAdapter implements Adapter {
         ("com.acta.adapter.pgp.PGPImport");
         environment.setSessionClassName
         ("com.acta.adapter.pgp.PGPSession");
-      //  if( publicKeyPGP==null || publicKeyPGP=="")
-        	setGeneratePGP("true");
+//Initialize PGP Environment      
+        crypto = new PGPCrypto(environment);
 	}
 
 	@Override
 	public void start() throws AdapterException {
- /*       //Check if the root directory exists
+        //Check if the PGP directory exists
         try
         {
-            if ( ! rootDirectory.endsWith(File.separator) )
-                    rootDirectory += File.separator;
-            File directory = new File ( rootDirectory ) ;
+            if ( ! directoryPGP.endsWith(File.separator) )
+                setDirectoryPGP(directoryPGP += File.separator);          
+            File directory = new File ( directoryPGP ) ;
             if ( !directory.isDirectory() )
-                throw new AdapterException ( "Cannot start WAdapter. The rootDirectory configuration parameter does not refer to the existing directory." ) ;
+                throw new AdapterException ( "Cannot start PGPAdapter. The DirectoryPGP configuration parameter does not refer to the existing directory." ) ;
+            if ( userNamePGP == null )
+                throw new AdapterException ( "PGP User name is not defined" ) ;
+            if ( emailPGP == null )
+                throw new AdapterException ( "PGP E-Mail address is not defined" ) ;
+            if ( passphrasePGP == null )
+                throw new AdapterException ( "PGP Passphrase is not defined" ) ;   
+      //Configure and Validate PGP Environment      
+            crypto.setUserName(userNamePGP);
+            crypto.setEmail(emailPGP);
+            crypto.setPasssword(passphrasePGP);
+            crypto.setKeyPath(directoryPGP);
+            crypto.setInstanceName(_adapterEnvironment.getInstanceName());  
+            boolean keyExist = false;
+            try{
+            	keyExist = crypto.validatePGPkeys();
+            }catch (Exception e) {
+               if (generatePGP == "false"){
+                   _adapterEnvironment.println("PGP Configuration is wrong (check error message below).");
+                   _adapterEnvironment.println( "Correct parameters or set 'Generate PGP' to 'true' to reset configuration");
+            	   throw new AdapterException ( e, "Cannot start PGPAdapter." );
+                }
+               else{
+                   _adapterEnvironment.println("!!!! New PGP Environment will be generated");
+                   try
+                   {
+                   crypto.createPGPkeys();
+                   }catch (Exception e1) {
+                       _adapterEnvironment.println("Failed to crteate PGP Environment");              	   
+                       throw new AdapterException ( e1, "Cannot start PGPAdapter." );
+                   }
+                   _adapterEnvironment.println("PGP Environment generated successfully");
+               }
+    	    }
+            String str_pkey = "";
+            try
+            {
+            	publicKeyPGP = crypto.getPublicKeyRing();
+            }catch (Exception e) {
+                _adapterEnvironment.println("Failed to gt Public Key");
+                throw new AdapterException ( e, "Cannot start PGPAdapter." );                
+            }        
+            _adapterEnvironment.println(publicKeyPGP);
+
+            
         }
         catch ( AdapterException e )
         {
@@ -52,9 +101,8 @@ public class PGPAdapter implements Adapter {
         }
         catch ( Exception e )
         {
-            throw new AdapterException ( e, "Cannot start WAdapter." ) ;
-        } 
-*/
+            throw new AdapterException ( e, "Cannot start PGPAdapter." );
+        }         
 	}
 
 	@Override
@@ -68,7 +116,7 @@ public class PGPAdapter implements Adapter {
     }
 
     public void setGeneratePGP(String param) {
-        this.generatePGP = param;
+        generatePGP = param;
     }
 	
     public String getUserNamePGP() {
@@ -76,7 +124,7 @@ public class PGPAdapter implements Adapter {
     }
 
     public void setUserNamePGP(String param) {
-        this.userNamePGP = param;
+        userNamePGP = param;
     }
     
     public String getEmailPGP() {
@@ -84,7 +132,7 @@ public class PGPAdapter implements Adapter {
     }
 
     public void setEmailPGP(String param) {
-        this.emailPGP = param;
+        emailPGP = param;
     }	
 	
     public String getPassphrasePGP() {
@@ -92,7 +140,7 @@ public class PGPAdapter implements Adapter {
     }
 
     public void setPassphrasePGP(String param) {
-        this.passphrasePGP = param;
+        passphrasePGP = param;
     }
     
     public String getDirectoryPGP() {
@@ -100,13 +148,13 @@ public class PGPAdapter implements Adapter {
     }
 
     public void setDirectoryPGP(String param) {
-        this.directoryPGP = param;
+        directoryPGP = param;
     }
     public String getPublicKeyPGP() {
         return publicKeyPGP;
     }
 
     public void setPublicKeyPGP(String param) {
-        this.publicKeyPGP = param;
+        publicKeyPGP = param;
     }
 }

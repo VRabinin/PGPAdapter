@@ -4,6 +4,8 @@ import java.io.FileNotFoundException;
 import java.io.FileInputStream;
 import java.io.ByteArrayOutputStream;
 
+import com.acta.adapter.pgp.crypto.AbstractTrace;
+
 public class PGPTest {
 	public static void main(String[] args) {
 		FileInputStream fin = null;

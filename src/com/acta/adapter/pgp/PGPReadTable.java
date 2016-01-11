@@ -9,7 +9,7 @@ public class PGPReadTable  implements TableSource, Delimited {
 		protected static Logger _logger = ActaLoggerManager.getLogger(PGPReadTable.class);
 		private OperationEnvironment  _adapterOperationEnvironment ;
 		private AdapterEnvironment    _adapterEnvironment ;
-//		private PGPAdapter           _adapter ;
+		private PGPAdapter           _adapter ;
 //		private PGPSession           _session ;
 		private PGPFileNode              _fileNode ; // adapter defined metadata
 		private String                _fullFileName ; // the name of the file with the data	
@@ -62,7 +62,9 @@ public class PGPReadTable  implements TableSource, Delimited {
 		public void metadata ( Object metadata )
 		{
 //Get table metadata composed in PGPImport
+		    _adapterOperationEnvironment.println ( "PGPReadTable::metadata" ) ;
 			_fileNode = (PGPFileNode)metadata ;
+			 _adapterOperationEnvironment.println (_fileNode.toString()); 
 		}
 		public String  getDateFormat ()
 		{
@@ -123,7 +125,7 @@ public class PGPReadTable  implements TableSource, Delimited {
 		  public void initialize ( OperationEnvironment adapterOperationEnvironment )
 		  {
 		    _adapterOperationEnvironment  = adapterOperationEnvironment ;
-//		    _adapter                      = (PGPAdapter)_adapterOperationEnvironment.getAdapter() ;
+		    _adapter                      = (PGPAdapter)_adapterOperationEnvironment.getAdapter() ;
 		    _adapterEnvironment           = _adapterOperationEnvironment.getAdapterEnvironment() ;
 //		    _session                      = (PGPSession)adapterOperationEnvironment.getSession() ;
 		    _characterSet				  = _adapterEnvironment.getCharacterSet();
@@ -156,36 +158,60 @@ public class PGPReadTable  implements TableSource, Delimited {
 		  {
 			    _adapterOperationEnvironment.println ( "PGPReadTable::begin" ) ;
 		    //Should receive back from engine metadata, saved during metadata import
-		    if ( null == _fileNode )
-		      throw new AdapterException ( "Metadata object is not set." ) ;
+		    if ( null == _fileNode ){
+			     _adapterOperationEnvironment.println ( "PGPReadTable::begin. Metadata objecty is not set" ) ;
+		         throw new AdapterException ( "Metadata object is not set." ) ;
+		    }
+		     _adapterOperationEnvironment.println ( "PGPReadTable::begin. Metadata received" ) ;
+			 _adapterOperationEnvironment.println (_fileNode.toString()); 
+		      File fd = new File ( _fileNode.getFileDirectory() );
 		    //For this test adapter we will read the entire file with assumption that
-		    // file contains data in UTF8 encodding
+		    // file contains data in UTF8 encoding
 		    // For real adapter it will not be practical because files could be big
 		    // and we at risk to get out of memory exception
-
-		    File f = new File ( _fullFileName ) ;
-		    int flen = (int)f.length() ;
-		    if ( f.exists() )
-		    {
-		      try
-		      {
-		        // read file
-		        FileInputStream fi = new FileInputStream(f) ;
-		        byte[] buffer = new byte[flen];
-		        int bytes_read;
-		        while ( (bytes_read = fi.read(buffer)) != -1 )
-		            _fileContent += new String( buffer, 0, bytes_read, _characterSet) ;//$JL-I18N$
-		        fi.close();
-		        //split all records on lines
-		        _lines = new StringTokenizer(_fileContent, _recordSeparator ) ;
-		      }
-		      catch ( Exception e )
-		      {
-		        throw new AdapterException ( e, "Cannot read input file " + _fullFileName + ". " ) ;
-		      }
+		    File[] files = fd.listFiles(new FilenameFilter() {
+		          @Override
+		          public boolean accept(File dir, String name) {
+		              return name.matches(_fileNode.getFileName());
+		          }
+		    });
+		    if (files.length == 0)
+		    	_adapterOperationEnvironment.println ( "PGPReadTable::begin. No files found" ) ;
+		    else{
+		    	int flen;
+		    	byte[] buffer;
+		    	int bytes_read;
+		    	FileInputStream fi = null;
+		        for ( int i = 0; i < files.length ; i++ ){
+		        	flen = (int)files[i].length() ;
+		    	if ( files[i].exists() )
+		    	{
+		    		try
+		    		{
+		    			// read file
+		    			fi = new FileInputStream(files[i]) ;
+		    			buffer = new byte[flen]; 			
+		    			while ( (bytes_read = fi.read(buffer)) != -1 )
+		    				_fileContent += new String( buffer, 0, bytes_read, _characterSet) ;//$JL-I18N$
+		    			fi.close();
+		    			//If there is no record separator after the last line - add it
+		    			if (!_fileContent.endsWith(_recordSeparator))
+		    				_fileContent +=_recordSeparator;
+		    		}
+		    		catch ( Exception e )
+		    		{
+		    			throw new AdapterException ( e, "Cannot read input file " + _fullFileName + ". " ) ;
+		    		}	    		
+		    	}
+		    	else{
+		    		_adapterOperationEnvironment.println ( "PGPReadTable::begin. Metadata received" ) ;
+		    		throw new AdapterException ( "File " +  _fullFileName + " does not exist." ) ;
+		        	}
+		    	}
+    			//split all records on lines
+    			_lines = new StringTokenizer(_fileContent, _recordSeparator ) ;
+    			_fileContent = new String() ;
 		    }
-		    else
-		      throw new AdapterException ( "File " +  _fullFileName + " does not exist." ) ;
 		  }	  
 
 		  /**
@@ -214,8 +240,11 @@ public class PGPReadTable  implements TableSource, Delimited {
 		        }
 		        catch ( NoSuchElementException e )
 		        {
-		       
 		        	_logger.warning(e.getLocalizedMessage());
+		        }
+		        catch (NullPointerException e1){
+		        	_logger.warning(e1.getLocalizedMessage());	
+		        	_logger.warning("No data to transfer");	
 		        }
 		        if ( null != line )
 		        {
