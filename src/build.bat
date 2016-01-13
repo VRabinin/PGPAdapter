@@ -31,7 +31,7 @@ echo An ERROR occurred while Making Adapter.JAR files
 goto EXIT
 
 :D1
-pause
+//pause
 echo Generating the template configuration file for Adapter
 "%JREBIN%\java" -classpath "%CLASSPATH%;%LINK_DIR%\lib\pgpadapter.jar;d:\Install\PGP\PGP_Java\BountyCastle\bcpg-jdk15on-153.jar;d:\Install\PGP\PGP_Java\BountyCastle\bcprov-jdk15on-153.jar" com.acta.adapter.sdk.AdapterMain -a com.acta.adapter.pgp.PGPAdapter -d "%LINK_DIR%\adapters\config\templates\PGPAdapter.xml" > nul
 if exist "%LINK_DIR%\adapters\config\templates\PGPAdapter.xml" goto D2

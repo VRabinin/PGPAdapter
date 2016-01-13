@@ -194,13 +194,14 @@ public class PGPFileNode implements MetadataNode,MetadataNodeIcon
 		  {
 
 		    Vector<PGPColumnNode> v = new Vector<PGPColumnNode>() ;
-		    String fieldSeparator = "|" ;
+		//    String fieldSeparator = ";" ;
 		    String line = null;
 		    StringTokenizer fields = new StringTokenizer(tableDef, ";") ;
-		    setTableType ( PGPBrowse.METADATA_TABLE_DELIMITED) ;		    
+		//    setTableType ( PGPBrowse.METADATA_TABLE_DELIMITED) ;		    
+		    setTableType ( PGPBrowse.METADATA_TABLE_XML) ;		    
 		    try
 		    {
-		      setFieldSeparator (fieldSeparator) ;
+	//	      setFieldSeparator (fieldSeparator) ;
 		      while ( null != ( line = fields.nextToken() ) )
 		      {		    	  
 		        v.addElement(readColumns(line) ) ;

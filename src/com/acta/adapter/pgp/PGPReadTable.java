@@ -1,6 +1,8 @@
 package com.acta.adapter.pgp;
+import com.acta.adapter.pgp.crypto.AbstractTrace;
 import com.acta.adapter.sdk.*;
 import com.acta.util.log.ActaLoggerManager;
+
 import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
@@ -22,7 +24,7 @@ public class PGPReadTable  implements TableSource, Delimited {
 		// Automatically configured properties (not from Designer)
 		//---------------------------------------------------
 		private String               _recordSeparator = "\r\n";
-		private String               _fieldSeparator = ",";
+		private String               _fieldSeparator = ";";
 		//------------------------------------------------
 		// Configurable Properties
 		// Batch size
@@ -79,10 +81,16 @@ public class PGPReadTable  implements TableSource, Delimited {
 		{
 			if ( null != _fileNode )
 			{
-				if ( _fileNode.getTableType().equals ( PGPBrowse.METADATA_TABLE_DELIMITED ) )
+				//TEST row, to be removed
+				_fileNode.setTableType(PGPBrowse.METADATA_TABLE_XML);
+				if ( _fileNode.getTableType().equals ( PGPBrowse.METADATA_TABLE_DELIMITED ) ){
 					_recordFormat =  Table.RecordFormatDelimeted ;
-				else
+				    _adapterOperationEnvironment.println ( "PGPReadTable::getRecordFormat - Delimited" ) ;
+				}
+				else{
 					_recordFormat = Table.RecordFormatXml;
+			    _adapterOperationEnvironment.println ( "PGPReadTable::getRecordFormat - XML" ) ;
+				}
 			}
 			else
 				return -1 ;  // will blow up later
@@ -156,8 +164,10 @@ public class PGPReadTable  implements TableSource, Delimited {
 		   */
 		  public void begin() throws AdapterException
 		  {
+			  ByteArrayOutputStream decryptedStream = null;
 			    _adapterOperationEnvironment.println ( "PGPReadTable::begin" ) ;
 		    //Should receive back from engine metadata, saved during metadata import
+			_adapterOperationEnvironment.println ( "PGPReadTable::begin. RecordFormat="+String.valueOf(getRecordFormat()) ) ;    
 		    if ( null == _fileNode ){
 			     _adapterOperationEnvironment.println ( "PGPReadTable::begin. Metadata objecty is not set" ) ;
 		         throw new AdapterException ( "Metadata object is not set." ) ;
@@ -169,10 +179,13 @@ public class PGPReadTable  implements TableSource, Delimited {
 		    // file contains data in UTF8 encoding
 		    // For real adapter it will not be practical because files could be big
 		    // and we at risk to get out of memory exception
+		   //   FileFilter fileFilter = ;   
 		    File[] files = fd.listFiles(new FilenameFilter() {
 		          @Override
 		          public boolean accept(File dir, String name) {
-		              return name.matches(_fileNode.getFileName());
+		        	  String fileMask = _fileNode.getFileName().replaceAll("\\*", "(.*)");
+//				      _adapterOperationEnvironment.println (fileMask) ;		        	  
+		              return name.matches(fileMask);
 		          }
 		    });
 		    if (files.length == 0)
@@ -189,11 +202,20 @@ public class PGPReadTable  implements TableSource, Delimited {
 		    		try
 		    		{
 		    			// read file
+		    			decryptedStream = new ByteArrayOutputStream();
+					    _adapterOperationEnvironment.println ("PGPReadTable::begin. Processing file"+files[i].getName()) ;			    			
 		    			fi = new FileInputStream(files[i]) ;
-		    			buffer = new byte[flen]; 			
-		    			while ( (bytes_read = fi.read(buffer)) != -1 )
-		    				_fileContent += new String( buffer, 0, bytes_read, _characterSet) ;//$JL-I18N$
-		    			fi.close();
+		    			_adapter.crypto.decrypt(fi, decryptedStream, _adapter.getPassphrasePGP(), new AbstractTrace(_adapterEnvironment));
+		    			if (decryptedStream==null){
+						  _adapterOperationEnvironment.println ("PGPReadTable::begin. Decryption failed"+files[i].getName()) ;	
+						  throw new AdapterException("Decryption of file failed"+files[i].getName());
+		    			}
+		    		//	buffer = new byte[flen]; 			
+		    		//	while ( (bytes_read = fi.read(buffer)) != -1 )
+		    	//			_fileContent += new String( buffer, 0, bytes_read, _characterSet) ;//$JL-I18N$
+		    				_fileContent = decryptedStream.toString();
+		    				_adapterOperationEnvironment.println ("PGPReadTable::begin. File content: "+_fileContent);
+		    				fi.close();
 		    			//If there is no record separator after the last line - add it
 		    			if (!_fileContent.endsWith(_recordSeparator))
 		    				_fileContent +=_recordSeparator;
@@ -210,6 +232,7 @@ public class PGPReadTable  implements TableSource, Delimited {
 		    	}
     			//split all records on lines
     			_lines = new StringTokenizer(_fileContent, _recordSeparator ) ;
+	    		_adapterOperationEnvironment.println ( "PGPReadTable::begin. Lines: "+String.valueOf(_lines.countTokens()) ) ;  			
     			_fileContent = new String() ;
 		    }
 		  }	  
@@ -225,6 +248,7 @@ public class PGPReadTable  implements TableSource, Delimited {
 		  
 		  public String readNext() throws AdapterException, RecoverableOperationAdapterException
 		  {
+	        _adapterOperationEnvironment.println ( "PGPReadTable::readNext" ) ;
 		    String resultRow = new String() ;
 		    int recordsProcessed = 0 ;
 		    try
@@ -237,6 +261,7 @@ public class PGPReadTable  implements TableSource, Delimited {
 		        try
 		        {
 		          line = _lines.nextToken(); // should have at least one
+			        _adapterOperationEnvironment.println ( "PGPReadTable::readNext. Line: "+line ) ;		          
 		        }
 		        catch ( NoSuchElementException e )
 		        {
@@ -255,13 +280,14 @@ public class PGPReadTable  implements TableSource, Delimited {
 			          {
 			            // generate xml
 			            StringTokenizer st = new StringTokenizer(line, _fieldSeparator ) ;
-			            resultRow += _recordSeparator + "<AWA_Row>" ;
+				            resultRow += _recordSeparator + "<AWA_Row>" ;		            	
 			            try
 			            {
 			              for ( int j = 0; j < _fileNode.getColumns().length; j++ )
 			              {
 			                String colName = _fileNode.getColumns()[j].getName() ;
 			                String columnValue = st.nextToken();
+			                _adapterOperationEnvironment.println ( "PGPReadTable::readNext. Next token "+columnValue ) ;
 			                resultRow += "<" + colName + ">" + columnValue + "</" + colName + ">" ;
 			              }
 			            }
@@ -275,9 +301,11 @@ public class PGPReadTable  implements TableSource, Delimited {
 			          {
 			            resultRow += line + _recordSeparator ;
 			          }
+				      _adapterOperationEnvironment.println ( "PGPReadTable::readNext. Records processed: "+recordsProcessed ) ;
 			        }
 		        }
 		        else
+		        	//no more data
 		          break ;
 		      }
 		    }
@@ -285,9 +313,10 @@ public class PGPReadTable  implements TableSource, Delimited {
 		    {
 		      throw new AdapterException ( e ) ;
 		    }
-
+//Batch size reached, or no more data
 		      if ( _recordFormat == Table.RecordFormatXml )
 		        resultRow += "</AWA_BatchWrapper>" ;
+		      _adapterOperationEnvironment.println ( "PGPReadTable::readNext. Delimited Result row: "+resultRow) ;	      
 		    if ( recordsProcessed > 0 )
 		      return resultRow ;
 		    else

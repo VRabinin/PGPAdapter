@@ -8,7 +8,7 @@ public class PGPImportByName implements ImportByName {
     private String tableDefinition;
     private String fileDirectory;
     private String fileNameMask;    
-    
+    private String fieldDelimiter;      
     
     public String getTableDefinition() {
         return tableDefinition;
@@ -46,5 +46,12 @@ public class PGPImportByName implements ImportByName {
 
     public void setFileNameMask(String param) {
         this.fileNameMask = param;
+    }  
+    public String getFileldDelimiter() {
+        return fieldDelimiter;
+    }
+
+    public void setFieldDelimiter(String param) {
+        this.fieldDelimiter = param;
     }  
 }

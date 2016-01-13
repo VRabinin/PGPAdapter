@@ -9,6 +9,7 @@ import com.acta.adapter.sdk.ImportByName;
 import com.acta.adapter.sdk.MetadataImport;
 import com.acta.adapter.sdk.MetadataNode;
 import com.acta.adapter.sdk.Session;
+import com.acta.adapter.sdk.Table;
 import com.acta.metadata.AWTableMetadata;
 import com.acta.metadata.AWMetadata;
 import com.acta.metadata.AWColumn;
@@ -88,6 +89,8 @@ public class PGPImport implements MetadataImport {
 		 
 	     PGPFileNode fn = new PGPFileNode (fileNameMask, fileDirectory ) ;
 	     fn.setFileType ( PGPBrowse.METADATA_TABLE) ;
+	     fn.setTableType(PGPBrowse.METADATA_TABLE_XML);
+	     fn.setFieldSeparator(";");
 		 AWAttribute attr1 =
 				   new AWAttribute("PGP Import Directory", fileDirectory) ;
 				 AWAttribute attr2 =
@@ -115,6 +118,7 @@ public class PGPImport implements MetadataImport {
 		    awTable.setAttributes(new AWAttribute [] { attr1, attr2} );	 
 		    awTable.setTableDescription(tableDescription);
 		    awTable.setTableName(tableName);
+		   // awTable.set
 		    PGPColumnNode  [] colArray = new PGPColumnNode [ cols.size() ];
 		    cols.toArray(colArray);
 		    fn.setColumns(colArray);
