@@ -3,6 +3,7 @@ package com.acta.adapter.pgp;
 import com.acta.adapter.sdk.*;
 import com.acta.metadata.*;
 import com.acta.util.log.ActaLoggerManager;
+
 import java.util.*;
 import java.util.logging.Logger;
 //import java.io.*;
@@ -10,17 +11,42 @@ import java.util.logging.Logger;
 public class PGPFileNode implements MetadataNode,MetadataNodeIcon 
 	{
 		  protected static Logger _logger = ActaLoggerManager.getLogger(PGPFileNode.class);
-		  private String fileName ; //without extension
+		  private String fileName ; //without extension file name Mask
 		  private String fileDirectory ; //directory
+		  private String fileSubDirectory ;  // sub directory VBY
 		  private String fileType ; // table or document or function
 		  private String fieldSeparator ; // field (column) separator
+		  private String decimalSeparator ; // decimal point	
+		  private String recordFormat ; // decimal point				  
 		  private String tableType ;  //XML or delimited
+  //        private String fieldDelimiter = null; 
+		  private String fetchSize ; // Fetch , Batch size = null;
+		  private String skipHeaderRows ; // Header Rows to skip = null;
 
 		  private PGPColumnNode [] columns ; // the array of columns
 
 		  public int getIconID()
 		  {
 		    return 1;
+		  }
+
+
+		  public String getFetchSize()
+		  {
+		    return fetchSize ;
+		  }
+
+		  public void setFetchSize(String f)
+		  {
+			  fetchSize = f ;
+		  }		  
+		  
+		  public String getSkipHeaderRows(){
+			  return skipHeaderRows;
+		  }
+		  
+		  public void setSkipHeaderRows(String f){
+			  skipHeaderRows = f;
 		  }
 		  
 		  /**
@@ -37,6 +63,25 @@ public class PGPFileNode implements MetadataNode,MetadataNodeIcon
 		  {
 		    fieldSeparator = f ;
 		  }
+		  
+		  public String getDecimalSeparator()
+		  {
+		    return decimalSeparator ;
+		  }
+		  public void setDecimalSeparator(String f)
+		  {
+		    decimalSeparator = f ;
+		  }
+
+		  public String getRecordFormat()
+		  {
+		    return recordFormat ;
+		  }
+		  public void setRecordFormat(String f)
+		  {
+		    recordFormat = f ;
+		  }
+		  
 		  /**
 		   *Default constructor.
 		   */
@@ -48,10 +93,11 @@ public class PGPFileNode implements MetadataNode,MetadataNodeIcon
 		   *@param name the file name
 		   *@param dir the file directory
 		   */
-		  public PGPFileNode (String name, String dir)
+		  public PGPFileNode (String name, String dir , String subdir)
 		  {
 		    fileName = name ;
 		    fileDirectory = dir ;
+		    fileSubDirectory = subdir;
 		  }
 
 		  /**
@@ -96,10 +142,17 @@ public class PGPFileNode implements MetadataNode,MetadataNodeIcon
 		  /**
 		   * Sets the file directory.
 		   */
-		  public void setFileDirectory(String d)
+		  public void setFileDirectory(String d )
 		  {
 		    fileDirectory = d ;
 		  }
+		  public String getFileSubDirectory(){
+			  return fileSubDirectory;
+		  }
+		  public void setFileSubDirectory(String sd){
+			  fileSubDirectory = sd;
+		  }
+		  
 		  /**
 		   * Returns the file type {@link Browse#METADATA_TABLE METADATA_TABLE}
 		   * or  {@link Browse#METADATA_DOCUMENT METADATA_DOCUMENT}
@@ -278,8 +331,10 @@ public class PGPFileNode implements MetadataNode,MetadataNodeIcon
 		  {
 		    String ret = "FileNode: fileName: " + fileName
 		    + "\n:fileDirectory  " + fileDirectory
+		    + "\n:fileSubDirectory" + fileSubDirectory 
 		    + "\n:fileType  " + fileType
 		    + "\n:fieldSeparator  " + fieldSeparator
+		    + "\n:decimalSeparator  " + decimalSeparator		    
 		    + "\n:tableType  " +  tableType
 		    + "\n:Columns:\n " ;
 		    if ( null != columns )

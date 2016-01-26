@@ -20,7 +20,7 @@ public class PGPImport implements MetadataImport {
 	  AdapterEnvironment  _adapterEnvironment = null ;
 	  PGPAdapter         _adapter = null;
 	  PGPSession         _session = null;
-	  private String _metadataCharacterSet;
+	  private String 	_metadataCharacterSet;
 	  
 	@Override
 	public ImportByName importByName() {
@@ -39,7 +39,8 @@ public class PGPImport implements MetadataImport {
 	    _adapterEnvironment.println("PGPImport:importMetadata(Vector)");		
 	    Vector<AWMetadata> resourceMetadata = new Vector<AWMetadata>() ;
 	    PGPImportByName or = (PGPImportByName)r ;
-	    resourceMetadata.addElement ( importData( or.getTableName(), or.getTableDescription(), or.getTableDefinition(),or.getFileDirectory(), or.getFileNameMask() ) ) ;
+	    resourceMetadata.addElement ( importData( or.getFetchSize() , or.getFieldDelimiter(), or.getDecimalSeparator(), or.getRecordFormat(), or.getFileNameMask() , _session.getImportDirectory() , or.getFileSubDirectory() , or.getSkipHeaderRows() , or.getTableDefinition() , or.getTableDescription() , or.getTableName() ) ) ;
+	    //resourceMetadata.addElement ( importData( or.getTableName(), or.getTableDescription(), or.getTableDefinition(), or.getFileSubDirectory(), or.getFileNameMask() ) ) ;
 	    return resourceMetadata ;
 	}
 
@@ -81,20 +82,54 @@ public class PGPImport implements MetadataImport {
 		// TODO Auto-generated method stub
 		return true;
 	}
-
-	 private AWMetadata importData(String tableName, String tableDescription, String tableDefinition, String fileDirectory, String fileNameMask) throws AdapterException
-	  {
+	/*
+	or.getFetchSize() ,
+	or.getFieldDelimiter(), 
+	or.getFileNameMask() , 
+	fileDirectory - from _session
+	or.getFileSubDirectory() ,
+	or.getSkipHeaderRows() , 
+	or.getTableDefinition() ,
+	or.getTableDescription() , 
+	or.getTableName()
+	*/
+	// private AWMetadata importData(String tableName, String tableDescription, String tableDefinition, String fileDirectory, String fileNameMask) throws AdapterException
+	private AWMetadata importData(String fetchSize,
+			String fieldDelimiter,
+			String decimalSeparator,
+			String recordFormat,
+			String fileNameMask,
+			String fileDirectory,
+			String fileSubDirectory,
+			String skipHeaderRows,
+			String tableDefinition,
+			String tableDescription,
+			String tableName) throws AdapterException  
+	{
 //C1|varchar|10|0|true|field1;C2|decimal|10|2|false|field2
 		 _adapterEnvironment.println("PGPImport:importData");		
 		 
-	     PGPFileNode fn = new PGPFileNode (fileNameMask, fileDirectory ) ;
+	     PGPFileNode fn = new PGPFileNode(fileNameMask, fileDirectory , fileSubDirectory );
 	     fn.setFileType ( PGPBrowse.METADATA_TABLE) ;
-	     fn.setTableType(PGPBrowse.METADATA_TABLE_XML);
-	     fn.setFieldSeparator(";");
-		 AWAttribute attr1 =
-				   new AWAttribute("PGP Import Directory", fileDirectory) ;
-				 AWAttribute attr2 =
-				   new AWAttribute("PGP Filename Mask", fileNameMask) ;	
+	     if (recordFormat == "XML")
+	    	 fn.setTableType(PGPBrowse.METADATA_TABLE_XML);
+	     else
+		     fn.setTableType(PGPBrowse.METADATA_TABLE_DELIMITED);	    	 
+	    // fn.setFieldSeparator(";");
+	     fn.setFieldSeparator(fieldDelimiter);
+	     fn.setDecimalSeparator(decimalSeparator);
+	     fn.setRecordFormat(recordFormat);
+	     fn.setFetchSize(fetchSize);
+	     fn.setSkipHeaderRows(skipHeaderRows);
+	     AWAttribute attr1 =  new AWAttribute("PGP: Field Delimiter", fieldDelimiter );
+		 AWAttribute attr2 =  new AWAttribute("PGP: Decimal Separator", decimalSeparator);	
+	     AWAttribute attr3 =  new AWAttribute("PGP: Filename Mask", fileNameMask);
+	     AWAttribute attr4 =  new AWAttribute("PGP: Import Sub Directory", fileSubDirectory) ;
+		 AWAttribute attr5 =  new AWAttribute("PGP: Skip Header Rows", skipHeaderRows);
+		 AWAttribute attr6 =  new AWAttribute("PGP: Table Definition", tableDefinition);	 
+		// AWAttribute attr6 =  new AWAttribute("PGP: Table Description", tableDescription);
+		// AWAttribute attr7 =  new AWAttribute("PGP: Table Name", tableName) ;
+				 
 				 
          Vector<PGPColumnNode> cols = fn.readTableDescriptor(tableDefinition, _metadataCharacterSet) ;	 
 		 AWTableMetadata  awTable = new AWTableMetadata();	
@@ -109,13 +144,13 @@ public class PGPImport implements MetadataImport {
 				columns[i].setDatatype (cn.getDatatype());
 				columns[i].setLength(cn.getLength());		    
 				columns[i].setPrecision(cn.getPrecision());
-				columns[i].setScale(0);
+				columns[i].setScale(cn.getScale());
 				columns[i].setNullable(cn.getNullable());			 
 				columns[i].setDescription(cn.getDescription());
 			 }
 		    awTable.setColumns ( columns );
 		 }
-		    awTable.setAttributes(new AWAttribute [] { attr1, attr2} );	 
+		    awTable.setAttributes(new AWAttribute [] { attr1, attr2, attr3, attr4, attr5 } );	 
 		    awTable.setTableDescription(tableDescription);
 		    awTable.setTableName(tableName);
 		   // awTable.set
